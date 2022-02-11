@@ -1,0 +1,7 @@
+{
+  "query": "| count _sourceCategory",
+  "from": "2022-02-03T12:00:00",
+  "to": "2022-02-03T12:05:00",
+  "timeZone": "UTC",
+  "byReceiptTime": false
+}

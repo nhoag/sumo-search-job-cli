@@ -1,0 +1,4 @@
+---
+host: api.sumologic.com
+accessId: ACCESS_ID
+accessKey: ACCESS_KEY
