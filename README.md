@@ -4,11 +4,6 @@
 
 Install Golang (Homebrew or https://go.dev/doc/install).
 
-Might need to specify `GOPRIVATE`:
-```
-export GOPRIVATE=github.com/nhoag/sumologic-search-job-client-go
-```
-
 Build a binary:
 ```bash
 git clone git@github.com:nhoag/sumo-search-job-cli.git
@@ -18,6 +13,6 @@ go build -o sumo
 ./sumo -h
 ```
 
-Create an Access Key [here](https://service.sumologic.com/ui/#/preferences).
+Create a Sumo Logic Access Key [here](https://service.sumologic.com/ui/#/preferences).
 
 Add credentials to `~/.sumo-search-job-cli.yaml`.
