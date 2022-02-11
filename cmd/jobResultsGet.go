@@ -42,7 +42,7 @@ func executeJobResults(cmd *cobra.Command, args []string) {
 	recordsOnly, _ := cmd.Flags().GetBool("records")
 	msgOffset := Offset
 	recOffset := Offset
-	if !recordsOnly {
+	if !recordsOnly && *status.MessageCount > int32(0) {
 		for {
 			messages := client.GetSearchJobMessages(jobId, Limit, msgOffset)
 			messagesJson, _ := json.MarshalIndent(messages, "", "    ")
@@ -54,7 +54,7 @@ func executeJobResults(cmd *cobra.Command, args []string) {
 			time.Sleep(time.Duration(SleepSeconds) * time.Second)
 		}
 	}
-	if !messagesOnly {
+	if !messagesOnly && *status.RecordCount > int32(0) {
 		for {
 			records := client.GetSearchJobRecords(jobId, Limit, recOffset)
 			recordsJson, _ := json.MarshalIndent(records, "", "    ")
