@@ -66,7 +66,7 @@ func init() {
 	jobProcessFullCmd.Flags().BoolP("records", "r", false, "Retrieve records only")
 	jobProcessFullCmd.Flags().BoolP("messages", "m", false, "Retrieve messages only")
 	jobProcessFullCmd.Flags().BoolP("all", "a", true, "Retrieve all paginated results (default is first page)")
-	jobProcessFullCmd.Flags().Int32VarP(&Limit, "limit", "l", 50, "Specify pagination limit")
+	jobProcessFullCmd.Flags().Int32VarP(&Limit, "limit", "l", 100, "Specify pagination limit")
 	jobProcessFullCmd.Flags().Int32VarP(&Offset, "offset", "o", 0, "Specify pagination offset")
 	jobProcessFullCmd.Flags().BoolP("poll", "p", true, "Poll for status until search job is complete")
 	jobProcessFullCmd.Flags().Int32VarP(&SleepSeconds, "sleep", "Z", 1, "Specify sleep seconds")

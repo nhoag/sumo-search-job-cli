@@ -73,7 +73,7 @@ func init() {
 	jobResultsGetCmd.Flags().BoolP("records", "r", false, "Retrieve records only")
 	jobResultsGetCmd.Flags().BoolP("messages", "m", false, "Retrieve messages only")
 	jobResultsGetCmd.Flags().BoolP("all", "a", false, "Retrieve all paginated results (default is first page)")
-	jobResultsGetCmd.Flags().Int32VarP(&Limit, "limit", "l", 50, "Specify pagination limit")
+	jobResultsGetCmd.Flags().Int32VarP(&Limit, "limit", "l", 100, "Specify pagination limit")
 	jobResultsGetCmd.Flags().Int32VarP(&Offset, "offset", "o", 0, "Specify pagination offset")
 	jobResultsGetCmd.Flags().Int32VarP(&SleepSeconds, "sleep", "Z", 1, "Specify sleep seconds")
 	// @todo: Add format options
