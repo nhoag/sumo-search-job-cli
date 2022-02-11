@@ -2,6 +2,12 @@
 
 ## Install
 
+Might need to specify `GOPRIVATE`:
+```
+export GOPRIVATE=github.com/nhoag/sumologic-search-job-client-go
+```
+
+Build a binary:
 ```bash
 git clone git@github.com:nhoag/sumo-search-job-cli.git
 cd sumo-search-job-cli
