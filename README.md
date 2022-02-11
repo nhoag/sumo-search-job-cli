@@ -2,6 +2,8 @@
 
 ## Install
 
+Install Golang (Homebrew or https://go.dev/doc/install).
+
 Might need to specify `GOPRIVATE`:
 ```
 export GOPRIVATE=github.com/nhoag/sumologic-search-job-client-go
