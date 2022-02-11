@@ -75,6 +75,6 @@ func init() {
 	jobResultsGetCmd.Flags().BoolP("all", "a", false, "Retrieve all paginated results (default is first page)")
 	jobResultsGetCmd.Flags().Int32VarP(&Limit, "limit", "l", 50, "Specify pagination limit")
 	jobResultsGetCmd.Flags().Int32VarP(&Offset, "offset", "o", 0, "Specify pagination offset")
-	jobResultsGetCmd.Flags().Int32VarP(&SleepSeconds, "sleep", "Z", 0, "Specify sleep seconds")
+	jobResultsGetCmd.Flags().Int32VarP(&SleepSeconds, "sleep", "Z", 1, "Specify sleep seconds")
 	// @todo: Add format options
 }
