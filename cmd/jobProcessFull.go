@@ -69,4 +69,5 @@ func init() {
 	jobProcessFullCmd.Flags().Int32VarP(&Limit, "limit", "l", 50, "Specify pagination limit")
 	jobProcessFullCmd.Flags().Int32VarP(&Offset, "offset", "o", 0, "Specify pagination offset")
 	jobProcessFullCmd.Flags().BoolP("poll", "p", true, "Poll for status until search job is complete")
+	jobProcessFullCmd.Flags().Int32VarP(&SleepSeconds, "sleep", "Z", 0, "Specify sleep seconds")
 }
