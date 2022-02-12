@@ -48,11 +48,12 @@ var jobCreateCmd = &cobra.Command{
 }
 
 type JobDefinition struct {
-	Query         string `json:"query,omitempty"`
-	From          string `json:"from,omitempty"`
-	To            string `json:"to,omitempty"`
-	Timezone      string `json:"timeZone,omitempty"`
-	ByReceiptTime bool   `json:"byReceiptTime,omitempty"`
+	Query           string `json:"query,omitempty"`
+	From            string `json:"from,omitempty"`
+	To              string `json:"to,omitempty"`
+	Timezone        string `json:"timeZone,omitempty"`
+	ByReceiptTime   bool   `json:"byReceiptTime,omitempty"`
+	AutoParsingMode string `json:"autoParsingMode,omitempty"`
 }
 
 func buildPayload(cmd *cobra.Command, args []string) JobDefinition {
@@ -96,6 +97,9 @@ func buildPayload(cmd *cobra.Command, args []string) JobDefinition {
 	}
 	if len(Job) == 0 && len(JobFile) == 0 {
 		jobDef.ByReceiptTime, _ = cmd.Flags().GetBool("by-receipt-time")
+	}
+	if len(AutoParsingMode) > 0 {
+		jobDef.AutoParsingMode = AutoParsingMode
 	}
 
 	return jobDef
