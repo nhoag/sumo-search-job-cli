@@ -12,8 +12,10 @@ import (
 )
 
 var (
-	cfgFile string
-	Region  string
+	cfgFile    string
+	RegionOpt  string
+	QuietOpt   bool
+	VerboseOpt bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -36,7 +38,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.sumo-search-job-cli.yaml)")
 	// todo: hook up region to the client
-	rootCmd.PersistentFlags().StringVarP(&Region, "region", "R", "us1", "Deployment region of Sumo Logic instance")
+	rootCmd.PersistentFlags().StringVarP(&RegionOpt, "region", "R", "us1", "Deployment region of Sumo Logic instance")
 	// todo: Add support for quiet and verbose
 	rootCmd.PersistentFlags().BoolP("quiet", "S", false, "Don't display status updates")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Display verbose information")

@@ -19,18 +19,18 @@ import (
 )
 
 var (
-	Job     string
-	JobFile string
+	JobOpt     string
+	JobFileOpt string
 
-	Query     string
-	QueryFile string
+	QueryOpt     string
+	QueryFileOpt string
 
-	FromTime string
-	Span     string
-	ToTime   string
-	TimeZone string
+	FromTimeOpt string
+	DurationOpt string
+	ToTimeOpt   string
+	TimeZoneOpt string
 
-	AutoParsingMode string
+	AutoParsingModeOpt string
 )
 
 // jobCreateCmd represents the jobCreate command
@@ -41,9 +41,16 @@ var jobCreateCmd = &cobra.Command{
 	Search Job API. The returned Job ID can be used to query job status and
 	fetch search results.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		QuietOpt, _ = cmd.Flags().GetBool("quiet")
+		VerboseOpt, _ = cmd.Flags().GetBool("verbose")
+		if VerboseOpt {
+			fmt.Fprintf(os.Stderr, "%d\tSTART\tjobCreate\n", time.Now().UnixNano())
+		}
 		validateJobCreate()
-		location, jobId := executeSearchJob(buildPayload(cmd, args))
-		fmt.Fprintf(os.Stderr, "Location:\t%s\nJob ID:\t\t%s\n", location, jobId)
+		executeSearchJob(buildPayload(cmd, args))
+		if VerboseOpt {
+			fmt.Fprintf(os.Stderr, "%d\tEND\tjobCreate\n", time.Now().UnixNano())
+		}
 	},
 }
 
@@ -57,158 +64,183 @@ type JobDefinition struct {
 }
 
 func buildPayload(cmd *cobra.Command, args []string) JobDefinition {
+	if VerboseOpt {
+		fmt.Fprintf(os.Stderr, "%d\tSTART\tjobCreate::buildPayload()\n", time.Now().UnixNano())
+	}
+
 	var jobDef JobDefinition
 	jobDef.Timezone = "UTC"
-	if len(Job) > 0 {
-		json.Unmarshal([]byte(Job), &jobDef)
+	if len(JobOpt) > 0 {
+		json.Unmarshal([]byte(JobOpt), &jobDef)
 	}
-	if len(JobFile) > 0 {
-		content, err := ioutil.ReadFile(JobFile)
+	if len(JobFileOpt) > 0 {
+		content, err := ioutil.ReadFile(JobFileOpt)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 		json.Unmarshal([]byte(content), &jobDef)
 	}
-	if len(Query) > 0 {
-		jobDef.Query = Query
+	if len(QueryOpt) > 0 {
+		jobDef.Query = QueryOpt
 	}
-	if len(QueryFile) > 0 {
-		content, err := ioutil.ReadFile(QueryFile)
+	if len(QueryFileOpt) > 0 {
+		content, err := ioutil.ReadFile(QueryFileOpt)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 		jobDef.Query = string(content)
 	}
-	if len(Span) > 0 {
-		duration, _ := time.ParseDuration(Span)
+	if len(DurationOpt) > 0 {
+		duration, _ := time.ParseDuration(DurationOpt)
 		jobDef.To = time.Now().UTC().String()
 		jobDef.From = time.Now().Add(-duration).UTC().String()
 	}
-	if len(ToTime) > 0 {
-		jobDef.To = ToTime
+	if len(ToTimeOpt) > 0 {
+		jobDef.To = ToTimeOpt
 	}
-	if len(FromTime) > 0 {
-		jobDef.From = FromTime
+	if len(FromTimeOpt) > 0 {
+		jobDef.From = FromTimeOpt
 	}
-	if len(TimeZone) > 0 {
-		jobDef.Timezone = TimeZone
+	if len(TimeZoneOpt) > 0 {
+		jobDef.Timezone = TimeZoneOpt
 	}
-	if len(Job) == 0 && len(JobFile) == 0 {
+	if len(JobOpt) == 0 && len(JobFileOpt) == 0 {
 		jobDef.ByReceiptTime, _ = cmd.Flags().GetBool("by-receipt-time")
 	}
-	if len(AutoParsingMode) > 0 {
-		jobDef.AutoParsingMode = AutoParsingMode
+	if len(AutoParsingModeOpt) > 0 {
+		jobDef.AutoParsingMode = AutoParsingModeOpt
+	}
+	if VerboseOpt {
+		fmt.Fprintf(os.Stderr, "%d\tEND\tjobCreate::buildPayload()\n", time.Now().UnixNano())
 	}
 
 	return jobDef
 }
 
 func executeSearchJob(jobDef JobDefinition) (*url.URL, string) {
+	if VerboseOpt {
+		fmt.Fprintf(os.Stderr, "%d\tSTART\tjobCreate::executeSearchJob()\n", time.Now().UnixNano())
+	}
+
 	searchJobDef := *openapi.NewSearchJobDefinition()
 	searchJobDef.SetTo(jobDef.To)
 	searchJobDef.SetFrom(jobDef.From)
 	searchJobDef.SetTimeZone(jobDef.Timezone)
 	searchJobDef.SetQuery(jobDef.Query)
 
-	return client.CreateSearchJob(searchJobDef)
+	if VerboseOpt {
+		defJson, err := json.Marshal(searchJobDef)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+		}
+		fmt.Fprintf(os.Stderr, "SEARCH JOB: %s\n", string(defJson))
+	}
+
+	location, jobId := client.CreateSearchJob(searchJobDef)
+	if !QuietOpt {
+		fmt.Fprintf(os.Stderr, "Location:\t%s\nJob ID:\t\t%s\n", location, jobId)
+	}
+	if VerboseOpt {
+		fmt.Fprintf(os.Stderr, "%d\tEND\tjobCreate::executeSearchJob()\n", time.Now().UnixNano())
+	}
+
+	return location, jobId
+
 }
 
 func validateJobCreate() {
-	if len(Job) > 0 {
-		if len(JobFile) > 0 {
-			fmt.Println("job-file is not compatible with job")
+	if VerboseOpt {
+		fmt.Fprintf(os.Stderr, "%d\tSTART\tjobCreate::validateJobCreate()\n", time.Now().UnixNano())
+	}
+
+	if len(JobOpt) > 0 {
+		if len(JobFileOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "job-file is not compatible with job")
 			os.Exit(1)
 		}
-		if len(Query) > 0 {
-			fmt.Println("query is not compatible with job")
+		if len(QueryOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "query is not compatible with job")
 			os.Exit(1)
 		}
-		if len(QueryFile) > 0 {
-			fmt.Println("query-file is not compatible with job")
+		if len(QueryFileOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "query-file is not compatible with job")
 			os.Exit(1)
 		}
-		if len(FromTime) > 0 {
-			fmt.Println("from is not compatible with job")
+		if len(FromTimeOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "from is not compatible with job")
 			os.Exit(1)
 		}
-		if len(Span) > 0 {
-			fmt.Println("span is not compatible with job")
+		if len(DurationOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "span is not compatible with job")
 			os.Exit(1)
 		}
-		if len(ToTime) > 0 {
-			fmt.Println("to is not compatible with job")
+		if len(ToTimeOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "to is not compatible with job")
 			os.Exit(1)
 		}
-		if len(AutoParsingMode) > 0 {
-			fmt.Println("auto-parse is not compatible with job")
+		if len(AutoParsingModeOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "auto-parse is not compatible with job")
 			os.Exit(1)
 		}
 	}
-	if len(JobFile) > 0 {
+	if len(JobFileOpt) > 0 {
 		// @todo: check file is readable
-		if len(Job) > 0 {
-			fmt.Println("job is not compatible with job-file")
+		if len(JobOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "job is not compatible with job-file")
 			os.Exit(1)
 		}
-		if len(Query) > 0 {
-			fmt.Println("query is not compatible with job")
+		if len(QueryOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "query is not compatible with job")
 			os.Exit(1)
 		}
-		if len(QueryFile) > 0 {
-			fmt.Println("query-file is not compatible with job")
+		if len(QueryFileOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "query-file is not compatible with job")
 			os.Exit(1)
 		}
-		if len(FromTime) > 0 {
-			fmt.Println("from is not compatible with job")
+		if len(FromTimeOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "from is not compatible with job")
 			os.Exit(1)
 		}
-		if len(Span) > 0 {
-			fmt.Println("span is not compatible with job")
+		if len(DurationOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "span is not compatible with job")
 			os.Exit(1)
 		}
-		if len(ToTime) > 0 {
-			fmt.Println("to is not compatible with job")
+		if len(ToTimeOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "to is not compatible with job")
 			os.Exit(1)
 		}
-		if len(AutoParsingMode) > 0 {
-			fmt.Println("auto-parse is not compatible with job")
-			os.Exit(1)
-		}
-	}
-	if len(Query) > 0 {
-		if len(QueryFile) > 0 {
-			fmt.Println("query-file is not compatible with query")
+		fmt.Printf("%+v", AutoParsingModeOpt)
+		if len(AutoParsingModeOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "auto-parse is not compatible with job-file")
 			os.Exit(1)
 		}
 	}
-	if len(QueryFile) > 0 {
+	if len(QueryOpt) > 0 {
+		if len(QueryFileOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "query-file is not compatible with query")
+			os.Exit(1)
+		}
+	}
+	if len(QueryFileOpt) > 0 {
 		// @todo: check file is readable
-		if len(Query) > 0 {
-			fmt.Println("query is not compatible with query-file")
+		if len(QueryOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "query is not compatible with query-file")
 			os.Exit(1)
 		}
-		fileInfo, err := os.Stat(QueryFile)
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
-		mode := fileInfo.Mode()
-		fmt.Println(mode.Perm())
-		os.Exit(1)
 	}
-	if len(Span) > 0 {
-		if len(FromTime) > 0 {
-			fmt.Println("from is not compatible with span")
+	if len(DurationOpt) > 0 {
+		if len(FromTimeOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "from is not compatible with span")
 			os.Exit(1)
 		}
-		if len(ToTime) > 0 {
-			fmt.Println("to is not compatible with span")
+		if len(ToTimeOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "to is not compatible with span")
 			os.Exit(1)
 		}
-		if len(TimeZone) > 0 {
-			fmt.Println("timezone is not compatible with span")
+		if len(TimeZoneOpt) > 0 {
+			fmt.Fprintf(os.Stderr, "timezone is not compatible with span")
 			os.Exit(1)
 		}
 	}
@@ -218,73 +250,72 @@ func validateJobCreate() {
 	var err error
 	var duration time.Duration
 
-	if len(Span) > 0 {
-		duration, err = time.ParseDuration(Span)
+	if len(DurationOpt) > 0 {
+		duration, err = time.ParseDuration(DurationOpt)
 		if err != nil {
-			fmt.Println("Unable to parse the provided span: " + Span)
+			fmt.Fprintf(os.Stderr, "Unable to parse the provided span: "+DurationOpt)
 			os.Exit(1)
 		}
 		fromTime = time.Now().Add(-duration).UTC()
 	}
-	if len(ToTime) > 0 {
-		toTime, err = time.Parse("2006-01-02T15:04:05", ToTime)
+	if len(ToTimeOpt) > 0 {
+		toTime, err = time.Parse("2006-01-02T15:04:05", ToTimeOpt)
 		if err != nil {
-			fmt.Println("Unable to parse the provided to-time: " + ToTime)
+			fmt.Fprintf(os.Stderr, "Unable to parse the provided to-time: "+ToTimeOpt)
 			os.Exit(1)
 		}
 	}
-	if len(FromTime) > 0 {
-		fromTime, err = time.Parse("2006-01-02T15:04:05", FromTime)
+	if len(FromTimeOpt) > 0 {
+		fromTime, err = time.Parse("2006-01-02T15:04:05", FromTimeOpt)
 		if err != nil {
-			fmt.Println("Unable to parse the provided from-time: " + FromTime)
+			fmt.Fprintf(os.Stderr, "Unable to parse the provided from-time: "+FromTimeOpt)
 			os.Exit(1)
 		}
 	}
-	if len(JobFile) > 0 {
+	if len(JobFileOpt) > 0 {
 		var jobDef JobDefinition
-		content, err := ioutil.ReadFile(JobFile)
+		content, err := ioutil.ReadFile(JobFileOpt)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 		json.Unmarshal(content, &jobDef)
 		toTime, err = time.Parse("2006-01-02T15:04:05", jobDef.To)
 		if err != nil {
-			fmt.Println("Unable to parse the provided 'to' time: " + jobDef.To)
+			fmt.Fprintf(os.Stderr, "Unable to parse the provided 'to' time: "+jobDef.To)
 			os.Exit(1)
 		}
 		fromTime, err = time.Parse("2006-01-02T15:04:05", jobDef.From)
 		if err != nil {
-			fmt.Println("Unable to parse the provided 'from' time: " + jobDef.From)
+			fmt.Fprintf(os.Stderr, "Unable to parse the provided 'from' time: "+jobDef.From)
 			os.Exit(1)
 		}
 	}
 	if !fromTime.Before(toTime) {
-		fmt.Println("from " + fromTime.String() + " is not before to " + toTime.String())
+		fmt.Fprintf(os.Stderr, "from "+fromTime.String()+" is not before to "+toTime.String())
 		os.Exit(1)
+	}
+
+	if VerboseOpt {
+		fmt.Fprintf(os.Stderr, "%d\tEND\tjobCreate::validateJobCreate()\n", time.Now().UnixNano())
 	}
 }
 
 func init() {
 	rootCmd.AddCommand(jobCreateCmd)
 
-	jobCreateCmd.Flags().StringVarP(&Job, "job", "j", "", "Search job definition")
-	jobCreateCmd.Flags().StringVarP(&JobFile, "job-file", "J", "", "Path to file with full search job definition")
+	jobCreateCmd.Flags().StringVarP(&JobOpt, "job", "j", "", "Search job definition")
+	jobCreateCmd.Flags().StringVarP(&JobFileOpt, "job-file", "J", "", "Path to file with full search job definition")
 
-	jobCreateCmd.Flags().StringVarP(&Query, "query", "q", "", "Search query")
-	jobCreateCmd.Flags().StringVarP(&QueryFile, "query-file", "Q", "", "Path to file with search query")
+	jobCreateCmd.Flags().StringVarP(&QueryOpt, "query", "q", "", "Search query")
+	jobCreateCmd.Flags().StringVarP(&QueryFileOpt, "query-file", "Q", "", "Path to file with search query")
 
-	// - relative lookback (-3h)
-	jobCreateCmd.Flags().StringVarP(&Span, "span", "s", "", "Size of time span relative to now")
-	// - from time: 2017-07-16T00:00:00
-	// @todo: or milliseconds since epoch.
-	jobCreateCmd.Flags().StringVarP(&FromTime, "from", "f", "", "Search window start time")
-	// - to time: 2017-07-16T00:00:00
-	// @todo: or milliseconds since epoch.
-	jobCreateCmd.Flags().StringVarP(&ToTime, "to", "t", "", "Search window end time")
-	// - timezone if ^^^ not millis
-	jobCreateCmd.Flags().StringVarP(&TimeZone, "timezone", "z", "UTC", "Timezone to use for search window")
+	jobCreateCmd.Flags().StringVarP(&DurationOpt, "duration", "d", "", "Size of time span relative to now (e.g. -3h)")
+	// @todo: Add FromTimeMillis option: or milliseconds since epoch.
+	jobCreateCmd.Flags().StringVarP(&FromTimeOpt, "from", "f", "", "Search window start time (e.g. 2017-07-16T00:00:00")
+	// @todo: Add ToTimeMillis option: or milliseconds since epoch.
+	jobCreateCmd.Flags().StringVarP(&ToTimeOpt, "to", "t", "", "Search window end time (e.g. 2017-07-16T00:00:00)")
+	jobCreateCmd.Flags().StringVarP(&TimeZoneOpt, "timezone", "z", "UTC", "Timezone to use for search window")
 	jobCreateCmd.Flags().BoolP("by-receipt-time", "b", false, "Use receipt-time instead of log message timestamps")
-	// - autoParsingMode (default is 'perfomance', 'intelligent' automatically runs field extraction rules)
-	jobCreateCmd.Flags().StringVarP(&AutoParsingMode, "auto-parse", "A", "", "Specify auto-parsing mode to use")
+	jobCreateCmd.Flags().StringVarP(&AutoParsingModeOpt, "auto-parse", "A", "", "Specify auto-parsing mode to use (['performance'] or 'intelligent' - automatically runs field extraction rules)")
 }
