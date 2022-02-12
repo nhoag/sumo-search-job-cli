@@ -16,3 +16,10 @@ go build -o sumo
 Create a Sumo Logic Access Key [here](https://service.sumologic.com/ui/#/preferences).
 
 Add credentials to `~/.sumo-search-job-cli.yaml`.
+
+## Example Commands
+
+Perform the full life-cycle of initiating a search job, polling for status, fetching results, and deleting the job:
+```bash
+./sumo jobProcessFull -J ./resources/jobDefinition.json
+```
