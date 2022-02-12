@@ -39,7 +39,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.sumo-search-job-cli.yaml)")
 	// todo: hook up region to the client
 	rootCmd.PersistentFlags().StringVarP(&RegionOpt, "region", "R", "us1", "Deployment region of Sumo Logic instance")
-	// todo: Add support for quiet and verbose
 	rootCmd.PersistentFlags().BoolP("quiet", "S", false, "Don't display status updates")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Display verbose information")
 }

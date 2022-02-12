@@ -186,7 +186,6 @@ func validateJobCreate() {
 		}
 	}
 	if len(JobFileOpt) > 0 {
-		// @todo: check file is readable
 		if len(JobOpt) > 0 {
 			fmt.Fprintf(os.Stderr, "job is not compatible with job-file")
 			os.Exit(1)
@@ -224,7 +223,6 @@ func validateJobCreate() {
 		}
 	}
 	if len(QueryFileOpt) > 0 {
-		// @todo: check file is readable
 		if len(QueryOpt) > 0 {
 			fmt.Fprintf(os.Stderr, "query is not compatible with query-file")
 			os.Exit(1)
@@ -311,9 +309,9 @@ func init() {
 	jobCreateCmd.Flags().StringVarP(&QueryFileOpt, "query-file", "Q", "", "Path to file with search query")
 
 	jobCreateCmd.Flags().StringVarP(&DurationOpt, "duration", "d", "", "Size of time span relative to now (e.g. -3h)")
-	// @todo: Add FromTimeMillis option: or milliseconds since epoch.
+	// @todo: Add FromTimeMillis option: milliseconds since epoch.
 	jobCreateCmd.Flags().StringVarP(&FromTimeOpt, "from", "f", "", "Search window start time (e.g. 2017-07-16T00:00:00")
-	// @todo: Add ToTimeMillis option: or milliseconds since epoch.
+	// @todo: Add ToTimeMillis option: milliseconds since epoch.
 	jobCreateCmd.Flags().StringVarP(&ToTimeOpt, "to", "t", "", "Search window end time (e.g. 2017-07-16T00:00:00)")
 	jobCreateCmd.Flags().StringVarP(&TimeZoneOpt, "timezone", "z", "UTC", "Timezone to use for search window")
 	jobCreateCmd.Flags().BoolP("by-receipt-time", "b", false, "Use receipt-time instead of log message timestamps")

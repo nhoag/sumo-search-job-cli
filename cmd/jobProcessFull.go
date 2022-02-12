@@ -13,7 +13,6 @@ import (
 )
 
 // jobProcessFullCmd represents the jobProcessFull command
-// @todo: Make sure command descriptions are accurate.
 var jobProcessFullCmd = &cobra.Command{
 	Use:   "jobProcessFull",
 	Short: "Perform the full process for a Sumo Logic Search Job",
@@ -34,7 +33,6 @@ var jobProcessFullCmd = &cobra.Command{
 	},
 }
 
-// @todo: Each command should define it's own validate, which can then all be called here.
 func validateProcessFull() {
 	if VerboseOpt {
 		fmt.Fprintf(os.Stderr, "%d\tSTART\tjobProcessFull::validateProcessFull()\n", time.Now().UnixNano())
