@@ -54,6 +54,11 @@ func executeJobResults(cmd *cobra.Command, args []string) {
 		fmt.Fprintf(os.Stderr, "%d\tSTART\tjobResultsGet::executeJobResults()\n", time.Now().UnixNano())
 	}
 	status := executeStatusCheck(cmd, args)
+
+	if len(args) == 0 {
+		fmt.Fprintf(os.Stderr, "No jobId specified!")
+		os.Exit(1)
+	}
 	jobId := args[0]
 	all, _ := cmd.Flags().GetBool("all")
 	messagesOnly, _ := cmd.Flags().GetBool("messages")

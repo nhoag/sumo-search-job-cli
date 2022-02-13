@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 
 	openapi "github.com/nhoag/sumologic-search-job-client-go"
@@ -13,8 +14,28 @@ import (
 
 func getClient() *openapi.APIClient {
 	configuration := openapi.NewConfiguration()
-	configuration.Host = viper.GetString("host")
+	endpoint := getEndpoint(configuration.Servers)
+	if len(endpoint) == 0 {
+		endpoint = viper.GetString("host")
+	}
+	configuration.Host = endpoint
 	return openapi.NewAPIClient(configuration)
+}
+
+func getEndpoint(servers openapi.ServerConfigurations) string {
+	serverConfig := getServerConfig(servers)
+	m := regexp.MustCompile(`[^http(s)?//:][a-z0-9.-]+[^/api]`)
+	return m.FindString(serverConfig.URL)
+}
+
+func getServerConfig(servers openapi.ServerConfigurations) openapi.ServerConfiguration {
+	deployment := viper.GetString("deployment")
+	for _, server := range servers {
+		if strings.Contains(server.Description, strings.ToUpper(deployment)) {
+			return server
+		}
+	}
+	return openapi.ServerConfiguration{}
 }
 
 func getContext() context.Context {
