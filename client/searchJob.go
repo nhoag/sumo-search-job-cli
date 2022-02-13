@@ -17,7 +17,7 @@ func getClient() *openapi.APIClient {
 	// @todo: Update endpoint resolution to be more robust
 	endpoint := getEndpoint(configuration.Servers)
 	if len(endpoint) == 0 {
-		endpoint = viper.GetString("host")
+		endpoint = viper.GetString("default_host")
 	}
 	configuration.Host = endpoint
 	return openapi.NewAPIClient(configuration)

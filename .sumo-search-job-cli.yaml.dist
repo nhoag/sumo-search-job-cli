@@ -1,4 +1,14 @@
 ---
-host: api.sumologic.com
+# Valid options for default host:
+# - api.au.sumologic.com
+# - api.ca.sumologic.com
+# - api.de.sumologic.com
+# - api.eu.sumologic.com
+# - api.fed.sumologic.com
+# - api.jp.sumologic.com
+# - api.in.sumologic.com
+# - api.sumologic.com
+# - api.us2.sumologic.com
+default_host: api.sumologic.com
 accessId: ACCESS_ID
 accessKey: ACCESS_KEY
