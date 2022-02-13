@@ -85,6 +85,9 @@ func executeJobResults(cmd *cobra.Command, args []string) {
 			time.Sleep(time.Duration(SleepSecondsOpt) * time.Second)
 		}
 	}
+	if !QuietOpt && *status.MessageCount == int32(0) && *status.RecordCount == int32(0) {
+		fmt.Fprintf(os.Stderr, "No results for the specified search\n")
+	}
 	if VerboseOpt {
 		fmt.Fprintf(os.Stderr, "%d\tEND\tjobResultsGet::executeJobResults()\n", time.Now().UnixNano())
 	}
