@@ -9,7 +9,7 @@ Build a binary:
 git clone git@github.com:nhoag/sumo-search-job-cli.git
 cd sumo-search-job-cli
 cp .sumo-search-job-cli.yaml.dist ~/.sumo-search-job-cli.yaml
-go build -o sumo
+make build
 # Optional: Move the binary into a PATH directory
 ./sumo -h
 ```
