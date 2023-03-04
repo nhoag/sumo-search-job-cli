@@ -13,8 +13,8 @@ build:
 
 .PHONY: update
 update:
-	go get -u
-	go mod tidy
+	go get -u ./...
+	go mod tidy -go=1.16 && go mod tidy -go=1.17
 
 # https://stackoverflow.com/a/6273809/1826109
 %:
