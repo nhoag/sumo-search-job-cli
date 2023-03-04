@@ -3,7 +3,7 @@ module github.com/nhoag/sumo-search-job-cli
 go 1.17
 
 require (
-	github.com/nhoag/sumologic-search-job-client-go v0.0.0-20220213220113-8ea8062395ff
+	github.com/nhoag/sumologic-search-job-client-go v0.0.0-20230304225351-8d5387daa4ce
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
 )
